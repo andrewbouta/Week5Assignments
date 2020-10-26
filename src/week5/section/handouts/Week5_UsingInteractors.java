@@ -20,19 +20,23 @@ public class Week5_UsingInteractors extends GraphicsProgram {
 	//	setLayout(new GridLayout(1, 3)); // create and add GCanvas to a Console Layout
 
 		// Console is first element of the layout
-		 controlPanel();
-		 addActionListeners();
+		hMap = new HashMap<String, GObject>();
+		controlPanel();
+		addActionListeners();
+		addMouseListeners();
 	}
 
 	private void controlPanel() {
 		// Adding to control bar
-		//Add = new JButton("Add");
-		//Remove = new JButton("Remove");
-		//Clear = new JButton("Clear");
+		Add = new JButton("Add");
+		Remove = new JButton("Remove");
+		Clear = new JButton("Clear");
+		
 		// Add Canvas
 		//GCanvas myCanvas = new GCanvas();
 		//add(myCanvas);
-		textField = new JTextField(30); // Initialize TextField for nameField
+		
+		textField = new JTextField(MAX_NAME); // Initialize TextField for nameField
 		add(new JLabel("Name"), SOUTH); // Adding JLabel
 		add(textField, SOUTH); // Adding NameField
 		textField.addActionListener(this); // ActionListener for nameField
@@ -56,21 +60,45 @@ public class Week5_UsingInteractors extends GraphicsProgram {
 		add(rect);
 	}
 	
-	public void mouseDrag (MouseEvent e) {
-		
+	
+	// Mouse clicked, and saves location of clicked point
+		public void mouseClicked(MouseEvent e) {
+			if (currentObject != null)
+				currentObject.sendToFront();
+		}
+	
+	// Location wherever mouse is pressed
+	public void mousePressed(MouseEvent e) {
+		last = new GPoint(e.getPoint());
+		currentObject = getElementAt(last);
 	}
 	
+	// Method to drag mouse, detection from last location
+	public void mouseDrag(MouseEvent e) {
+		if (currentObject != null) {
+			currentObject.move(e.getX() - last.getX(), e.getY() - last.getY());
+			last = new GPoint(e.getPoint());
+		}
+	}
 
 	private void removeBox(String name) {
 		// GObject
+		GObject obj = hMap.get(name);
+		if (obj != null) {
+			remove(obj);
+		}
 	}
 
 	private void clearAll() {
 		Iterator<String> it = hMap.keySet().iterator(); // returns set view of keys, cycles through elements
 		while (it.hasNext()) {
-
+			removeBox(it.next());
 		}
+		hMap.clear(); // Rids the objects within the HashMap
 	}
+	
+	
+	
 
 	public void actionPerformed(ActionEvent e) {
 
@@ -80,7 +108,7 @@ public class Week5_UsingInteractors extends GraphicsProgram {
 		} else if (selection == Remove) {
 			removeBox(textField.getText());
 		} else if (selection == Clear) {
-			// clearAll;
+			clearAll();
 		}
 
 		/*
